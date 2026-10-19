@@ -25,6 +25,7 @@ The goal of this project is to optimize the performance of the AI controlling th
 - Clone **your forked repository** to your local machine.
 - Adjust the settings in [`js/AISettings.js`](js/AISettings.js) to experiment with the AI's
   performance.
+    - Feel free to use LLMs to help you understand the code and make improvements.
 - Add, Commit, and Push your changes to your forked repository.
 
 ```bash

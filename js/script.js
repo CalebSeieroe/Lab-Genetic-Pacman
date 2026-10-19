@@ -13,6 +13,7 @@ let frightenedTimer = 0;
 
 const UI = {
     canvas: document.querySelector('#canvas-container'),
+    gameMessage: document.querySelector('#game-message'),
     resetButton: document.querySelector('#reset'),
     userModeButton: document.querySelector('#user-mode-btn'),
     aiModeButton: document.querySelector('#ai-mode-btn'),
@@ -84,12 +85,6 @@ function isWalkableTile(x, y) {
     const normalizedX = normalizeTileX(x, y);
     if (normalizedX === null) return false;
     return grid[y][normalizedX] !== '1' && grid[y][normalizedX] !== '-';
-}
-
-function canOccupyPosition(x, y) {
-    const tileX = Math.floor(x + 0.5);
-    const tileY = Math.floor(y + 0.5);
-    return isWalkableTile(tileX, tileY);
 }
 
 function canMoveInDirection(x, y, direction) {
@@ -277,28 +272,16 @@ function updateNeatapticController() {
         }
     }
 
-    const wallUp = pacman.canMoveInDir(DIR.UP)
-        ? AI_SETTINGS.inputs.pathClear
-        : AI_SETTINGS.inputs.wallDetected;
-    const wallDown = pacman.canMoveInDir(DIR.DOWN)
-        ? AI_SETTINGS.inputs.pathClear
-        : AI_SETTINGS.inputs.wallDetected;
-    const wallLeft = pacman.canMoveInDir(DIR.LEFT)
-        ? AI_SETTINGS.inputs.pathClear
-        : AI_SETTINGS.inputs.wallDetected;
-    const wallRight = pacman.canMoveInDir(DIR.RIGHT)
-        ? AI_SETTINGS.inputs.pathClear
-        : AI_SETTINGS.inputs.wallDetected;
-
     const inputs = [
         nearestDotDistX,
         nearestDotDistY,
         ghostDistX,
         ghostDistY,
-        wallUp,
-        wallDown,
-        wallLeft,
-        wallRight,
+        ...DIRECTIONS.map((direction) =>
+            pacman.canMoveInDir(direction)
+                ? AI_SETTINGS.inputs.pathClear
+                : AI_SETTINGS.inputs.wallDetected,
+        ),
     ];
     const outputs = geneticAlgorithm.activate(inputs);
     if (!outputs) return;
@@ -314,12 +297,9 @@ function updateNeatapticController() {
 }
 
 function setup() {
-    const availableWidth = Math.min(
-        UI.canvas.clientWidth,
-        windowWidth - 32,
-        1000,
+    TILE_SIZE = Math.floor(
+        Math.min(UI.canvas.clientWidth, windowWidth - 32, 1000) / COLS,
     );
-    TILE_SIZE = Math.floor(availableWidth / COLS);
 
     const canvas = createCanvas(COLS * TILE_SIZE, ROWS * TILE_SIZE);
     canvas.parent(UI.canvas);
@@ -356,12 +336,9 @@ function preload() {
 }
 
 function windowResized() {
-    const availableWidth = Math.min(
-        UI.canvas.clientWidth,
-        windowWidth - 32,
-        1000,
+    TILE_SIZE = Math.floor(
+        Math.min(UI.canvas.clientWidth, windowWidth - 32, 1000) / COLS,
     );
-    TILE_SIZE = Math.floor(availableWidth / COLS);
     resizeCanvas(COLS * TILE_SIZE, ROWS * TILE_SIZE);
 }
 
@@ -428,9 +405,7 @@ function startUserGame() {
 function startAIGame() {
     aiMode = true;
     UI.speedSlider.disabled = false;
-    geneticAlgorithm = new GeneticAlgorithm(
-        AI_SETTINGS.geneticAlgorithm.populationSize,
-    );
+    geneticAlgorithm = new GeneticAlgorithm();
     geneticAlgorithm.start();
     score = 0;
     level = 1;
@@ -470,7 +445,7 @@ function finishAIAgent() {
         (level - 1) * AI_SETTINGS.rewards.levelCompletedBonus +
         Math.floor(agentFrames / AI_SETTINGS.simulation.framesPerSecond) *
             AI_SETTINGS.rewards.survivalPointsPerSecond;
-    const generationCompleted = geneticAlgorithm.completeAgent(fitness);
+    geneticAlgorithm.completeAgent(fitness);
 
     score = 0;
     level = 1;
