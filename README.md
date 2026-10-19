@@ -11,23 +11,20 @@
 ..:::::::::..:::::..:::......::::::::::::..:::::..::..:::::..::..::::..::
 ```
 
-Given a p5.js game implement Neuroevolution to train a neural network to play the game.
-Pac-man must learn to avoid ghosts and collect pellets using a genetic algorithm to evolve.
-The ghosts will be controlled by a simple AI that moves similarly to the original Pac-man game.
-Meaning the ghosts movement is not random and can be predicted by the "player" (Pac-man).
+> Learning Outcome: Reinforce using Git and optimizing genetic algorithms.
 
-Pac-Man cycles through the direction-specific animation frames in `assets/sprites/`, and each ghost uses its sprite from the same folder. Frightened ghosts use the blue ghost sprite.
+This project is a clone of the classic game Pac-Man built with [p5.js](https://p5js.org/).
+The ghost can be controlled by a player or a genetic algorithm.
+The goal of this project is to optimize the performance of the AI controlling the ghost using a genetic algorithm.
 
-AI fitness is calculated as game score, plus 100 points per pellet eaten,
-10,000 points per level cleared, and one point per simulated second survived.
-After all eight ghosts finish, the next generation is bred from the better
-performers.
+![UI-Screenshot](assets/ui-screenshot.webp)
 
 ## What Do I Do?
 
 - Fork this repository to your own GitHub account.
 - Clone **your forked repository** to your local machine.
-- Adjust the "magic numbers" in the code to improve the AI's performance.
+- Adjust the settings in [`js/AISettings.js`](js/AISettings.js) to experiment with the AI's
+  performance.
 - Add, Commit, and Push your changes to your forked repository.
 
 ```bash

@@ -8,9 +8,8 @@ let pelletsLeft = 0;
 let pelletsCollected = 0;
 let agentFrames = 0;
 let aiMode = false;
-let simulationSpeed = 1;
+let simulationSpeed = AI_SETTINGS.simulation.speedDefault;
 let frightenedTimer = 0;
-const frightenedDuration = 360;
 
 const UI = {
     canvas: document.querySelector('#canvas-container'),
@@ -249,9 +248,9 @@ function updateNeatapticController() {
     // 2. Relative position of nearest Ghost (X, Y)
     // 3. Wall awareness in 4 directions (1 = Wall, 0 = Clear)
 
-    let nearestDotDistX = 0;
-    let nearestDotDistY = 0;
-    let minDist = 999;
+    let nearestDotDistX = AI_SETTINGS.inputs.noTargetOffset;
+    let nearestDotDistY = AI_SETTINGS.inputs.noTargetOffset;
+    let minDist = Infinity;
 
     for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS; c++) {
@@ -266,9 +265,9 @@ function updateNeatapticController() {
         }
     }
 
-    let ghostDistX = 1.0;
-    let ghostDistY = 1.0;
-    let minGhostDist = 999;
+    let ghostDistX = AI_SETTINGS.inputs.noGhostOffset;
+    let ghostDistY = AI_SETTINGS.inputs.noGhostOffset;
+    let minGhostDist = Infinity;
     for (let g of ghosts) {
         let d = dist(pacman.x, pacman.y, g.x, g.y);
         if (d < minGhostDist) {
@@ -278,10 +277,18 @@ function updateNeatapticController() {
         }
     }
 
-    const wallUp = pacman.canMoveInDir(DIR.UP) ? 0 : 1;
-    const wallDown = pacman.canMoveInDir(DIR.DOWN) ? 0 : 1;
-    const wallLeft = pacman.canMoveInDir(DIR.LEFT) ? 0 : 1;
-    const wallRight = pacman.canMoveInDir(DIR.RIGHT) ? 0 : 1;
+    const wallUp = pacman.canMoveInDir(DIR.UP)
+        ? AI_SETTINGS.inputs.pathClear
+        : AI_SETTINGS.inputs.wallDetected;
+    const wallDown = pacman.canMoveInDir(DIR.DOWN)
+        ? AI_SETTINGS.inputs.pathClear
+        : AI_SETTINGS.inputs.wallDetected;
+    const wallLeft = pacman.canMoveInDir(DIR.LEFT)
+        ? AI_SETTINGS.inputs.pathClear
+        : AI_SETTINGS.inputs.wallDetected;
+    const wallRight = pacman.canMoveInDir(DIR.RIGHT)
+        ? AI_SETTINGS.inputs.pathClear
+        : AI_SETTINGS.inputs.wallDetected;
 
     const inputs = [
         nearestDotDistX,
@@ -298,7 +305,7 @@ function updateNeatapticController() {
 
     // Find max output direction index
     let maxIdx = 0;
-    for (let i = 1; i < 4; i++) {
+    for (let i = 1; i < outputs.length; i++) {
         if (outputs[i] > outputs[maxIdx]) maxIdx = i;
     }
 
@@ -324,7 +331,12 @@ function setup() {
     UI.aiModeButton.addEventListener('click', startAIGame);
     UI.speedSlider.addEventListener('input', updateSimulationSpeed);
 
-    frameRate(60);
+    UI.speedSlider.min = AI_SETTINGS.simulation.speedMinimum;
+    UI.speedSlider.max = AI_SETTINGS.simulation.speedMaximum;
+    UI.speedSlider.step = AI_SETTINGS.simulation.speedStep;
+    UI.speedSlider.value = AI_SETTINGS.simulation.speedDefault;
+    updateSimulationSpeed();
+    frameRate(AI_SETTINGS.simulation.framesPerSecond);
 }
 
 function preload() {
@@ -416,7 +428,9 @@ function startUserGame() {
 function startAIGame() {
     aiMode = true;
     UI.speedSlider.disabled = false;
-    geneticAlgorithm = new GeneticAlgorithm();
+    geneticAlgorithm = new GeneticAlgorithm(
+        AI_SETTINGS.geneticAlgorithm.populationSize,
+    );
     geneticAlgorithm.start();
     score = 0;
     level = 1;
@@ -452,9 +466,10 @@ function advanceToNextLevel() {
 function finishAIAgent() {
     const fitness =
         score +
-        pelletsCollected * 100 +
-        (level - 1) * 10000 +
-        Math.floor(agentFrames / 60);
+        pelletsCollected * AI_SETTINGS.rewards.collectedPelletBonus +
+        (level - 1) * AI_SETTINGS.rewards.levelCompletedBonus +
+        Math.floor(agentFrames / AI_SETTINGS.simulation.framesPerSecond) *
+            AI_SETTINGS.rewards.survivalPointsPerSecond;
     const generationCompleted = geneticAlgorithm.completeAgent(fitness);
 
     score = 0;
@@ -469,7 +484,7 @@ function finishAIAgent() {
 }
 
 function triggerFrightenedState() {
-    frightenedTimer = frightenedDuration;
+    frightenedTimer = AI_SETTINGS.actors.frightenedDurationFrames;
     for (let g of ghosts) {
         if (g.state !== 'EATEN') {
             g.state = 'FRIGHTENED';

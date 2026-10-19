@@ -1,10 +1,9 @@
 class GeneticAlgorithm {
-    constructor(populationSize = 8) {
+    constructor(populationSize = AI_SETTINGS.geneticAlgorithm.populationSize) {
         this.populationSize = populationSize;
-        this.inputCount = 8;
-        this.hiddenCount = 12;
-        this.outputCount = 4;
-        this.mutationRate = 0.15;
+        this.inputCount = AI_SETTINGS.network.inputCount;
+        this.hiddenCount = AI_SETTINGS.network.hiddenNeuronCount;
+        this.outputCount = AI_SETTINGS.network.outputCount;
         this.generation = 1;
         this.agentIndex = 0;
         this.population = [];
@@ -54,15 +53,21 @@ class GeneticAlgorithm {
 
     evolve() {
         this.population.sort((first, second) => second.fitness - first.fitness);
-        const nextPopulation = [
-            {
-                network: this.cloneNetwork(this.population[0].network),
+        const nextPopulation = this.population
+            .slice(0, AI_SETTINGS.geneticAlgorithm.eliteCount)
+            .map((agent) => ({
+                network: this.cloneNetwork(agent.network),
                 fitness: null,
-            },
-        ];
+            }));
         const parentPool = this.population.slice(
             0,
-            Math.max(2, Math.ceil(this.populationSize / 2)),
+            Math.max(
+                AI_SETTINGS.geneticAlgorithm.minimumParentCount,
+                Math.ceil(
+                    this.populationSize *
+                        AI_SETTINGS.geneticAlgorithm.parentPoolFraction,
+                ),
+            ),
         );
 
         while (nextPopulation.length < this.populationSize) {
@@ -94,11 +99,15 @@ class GeneticAlgorithm {
         const secondConnections = secondNetwork.connections;
 
         child.connections.forEach((connection, index) => {
-            if (Math.random() < 0.5) {
+            if (Math.random() < AI_SETTINGS.geneticAlgorithm.crossoverRate) {
                 connection.weight = secondConnections[index].weight;
             }
-            if (Math.random() < this.mutationRate) {
-                connection.weight += Math.random() * 2 - 1;
+            if (
+                Math.random() < AI_SETTINGS.geneticAlgorithm.mutationRate
+            ) {
+                connection.weight +=
+                    (Math.random() * 2 - 1) *
+                    AI_SETTINGS.geneticAlgorithm.mutationStrength;
             }
         });
         return child;

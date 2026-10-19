@@ -13,7 +13,7 @@ class Ghost {
         this.y = this.spawnGy;
         this.dir = DIR.UP;
         this.state = 'CHASE';
-        this.speed = 0.09;
+        this.speed = AI_SETTINGS.actors.ghostSpeed;
     }
 
     update() {
@@ -55,9 +55,10 @@ class Ghost {
     move() {
         const speed =
             this.state === 'FRIGHTENED'
-                ? this.speed * 0.6
+                ? this.speed *
+                  AI_SETTINGS.actors.frightenedGhostSpeedMultiplier
                 : this.state === 'EATEN'
-                  ? this.speed * 1.8
+                  ? this.speed * AI_SETTINGS.actors.eatenGhostSpeedMultiplier
                   : this.speed;
         moveActor(this, this.dir, speed);
     }
@@ -65,14 +66,15 @@ class Ghost {
     checkCollision() {
         if (
             gameState !== 'PLAYING' ||
-            dist(this.x, this.y, pacman.x, pacman.y) >= 0.7
+            dist(this.x, this.y, pacman.x, pacman.y) >=
+                AI_SETTINGS.actors.collisionDistance
         ) {
             return;
         }
 
         if (this.state === 'FRIGHTENED') {
             this.state = 'EATEN';
-            score += 200;
+            score += AI_SETTINGS.rewards.ghost;
             playSound('eat_ghost');
             updateScoreUI();
         } else if (this.state !== 'EATEN') {
@@ -94,14 +96,15 @@ class Ghost {
             targetX = this.spawnGx;
             targetY = this.spawnGy;
         } else if (this.name === 'Pinky') {
-            targetX += pacman.dir.x * 4;
-            targetY += pacman.dir.y * 4;
+            targetX += pacman.dir.x * AI_SETTINGS.opponents.pinkyTargetOffset;
+            targetY += pacman.dir.y * AI_SETTINGS.opponents.pinkyTargetOffset;
         } else if (this.name === 'Inky') {
-            targetX += pacman.dir.x * 2;
-            targetY += pacman.dir.y * 2;
+            targetX += pacman.dir.x * AI_SETTINGS.opponents.inkyTargetOffset;
+            targetY += pacman.dir.y * AI_SETTINGS.opponents.inkyTargetOffset;
         } else if (
             this.name === 'Clyde' &&
-            dist(this.x, this.y, pacman.x, pacman.y) < 6
+            dist(this.x, this.y, pacman.x, pacman.y) <
+                AI_SETTINGS.opponents.clydeScatterDistance
         ) {
             targetX = this.scatterX;
             targetY = this.scatterY;

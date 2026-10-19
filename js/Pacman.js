@@ -10,7 +10,7 @@ class Pacman {
         this.y = this.spawnGy;
         this.dir = DIR.NONE;
         this.nextDir = DIR.NONE;
-        this.speed = 0.12;
+        this.speed = AI_SETTINGS.actors.pacmanSpeed;
     }
 
     setNextDirection(newDir) {
@@ -52,7 +52,10 @@ class Pacman {
         grid[tileY][tileX] = ' ';
         pelletsLeft--;
         pelletsCollected++;
-        score += tile === '.' ? 10 : 50;
+        score +=
+            tile === '.'
+                ? AI_SETTINGS.rewards.dot
+                : AI_SETTINGS.rewards.powerPellet;
         playSound(tile === '.' ? 'chomp' : 'power');
         if (tile === 'o') triggerFrightenedState();
         updateScoreUI();
