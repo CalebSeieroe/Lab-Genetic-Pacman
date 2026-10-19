@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Pac-Man</title>
+        <link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
+        <link rel="stylesheet" href="style.css" />
+        <!-- p5.js Library -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+        <!-- Neataptic AI Library -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/neataptic/1.4.7/neataptic.js"></script>
+        <!-- Our JS -->
+        <script src="js/GeneticAlgorithm.js" defer></script>
+        <script src="js/Pacman.js" defer></script>
+        <script src="js/Ghost.js" defer></script>
+        <script src="js/script.js" defer></script>
+    </head>
+    <body>
+        <header>
+            <h1>
+                <img src="assets/logo.svg" alt="Pac-Man Logo" />
+            </h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li>
+                        <a href="boardCraftingTool.html">Board Crafting Tool</a>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+        <main>
+            <div id="game-container">
+                <section>
+                    <table>
+                        <caption>
+                            Simulation Statistics
+                        </caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">Generation</th>
+                                <th scope="col">Agent</th>
+                                <th scope="col">High Score</th>
+                                <th scope="col">Max Level</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td id="gen-display">1</td>
+                                <td id="agent-display">-</td>
+                                <td id="highscore-display">000000</td>
+                                <td id="level-display">1</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+                <!-- Game Canvas Screen -->
+                <section id="game-screen">
+                    <!-- Canvas Box -->
+                    <div id="canvas-container">
+                        <!-- Canvas injected here by p5.js -->
+                    </div>
+                    <div id="modes">
+                        <button id="reset" type="button">Reset</button>
+                        <button id="user-mode-btn" type="button">
+                            User Play
+                        </button>
+                        <button id="ai-mode-btn" type="button">
+                            AI Training
+                        </button>
+                        <label id="speed-control" for="speed-up-slider">
+                            Simulation speed
+                            <input
+                                id="speed-up-slider"
+                                type="range"
+                                min="1"
+                                max="10"
+                                step="1"
+                                value="1"
+                                disabled
+                            />
+                            <output id="speed-value" for="speed-up-slider"
+                                >1×</output
+                            >
+                        </label>
+                    </div>
+                </section>
+            </div>
+
+            <aside>
+                <h3>Ghosts Behavior</h3>
+                <div>
+                    <h4>Modes</h4>
+                    <ul>
+                        <li>
+                            Scatter: Ghosts move to their corners of the maze.
+                            No ghost will chase Pac-Man.
+                        </li>
+                        <li>
+                            Scared: When Pac-Man eats a power pellet, the ghosts
+                            turn blue. The ghosts movement is random and slower.
+                        </li>
+                        <li>
+                            Chase: Ghosts will chase Pac-Man. Each ghost has a
+                            different strategy to chase Pac-Man.
+                        </li>
+                    </ul>
+                </div>
+                <div id="ghost-list">
+                    <figure class="ghost">
+                        <img
+                            src="assets/sprites/ghosts/blinky.png"
+                            alt="Blinky"
+                        />
+                        <figcaption>Blinky</figcaption>
+                        <p>Goes in a straight line to Pac-Man's position.</p>
+                    </figure>
+                    <figure class="ghost">
+                        <img
+                            src="assets/sprites/ghosts/pinky.png"
+                            alt="Pinky"
+                        />
+                        <figcaption>Pinky</figcaption>
+                        <p>Tries to get in front of Pac-Man's position.</p>
+                    </figure>
+                    <figure class="ghost">
+                        <img src="assets/sprites/ghosts/inky.png" alt="Inky" />
+                        <figcaption>Inky</figcaption>
+                        <p>Tries to trap Pac-Man between himself and Blinky.</p>
+                    </figure>
+                    <figure class="ghost">
+                        <img
+                            src="assets/sprites/ghosts/clyde.png"
+                            alt="Clyde"
+                        />
+                        <figcaption>Clyde</figcaption>
+                        <p>
+                            Chases Pac-Man, but will run away if he gets too
+                            close.
+                        </p>
+                    </figure>
+                </div>
+            </aside>
+            <audio id="background-music" autoplay>
+                <source src="assets/sound/intro.wav" type="audio/wav" />
+                <source src="assets/sound/intro.aiff" type="audio/aiff" />
+            </audio>
+        </main>
+
+        <footer>
+            IHCC Pac-Man Neuroevolution Project - <a href="#>">GitHub</a>
+        </footer>
+    </body>
+</html>
