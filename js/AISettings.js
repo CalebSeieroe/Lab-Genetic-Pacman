@@ -3,7 +3,7 @@
 const AI_SETTINGS = Object.freeze({
     network: {
         inputCount: 8,
-        hiddenNeuronCount: 4,
+        hiddenNeuronCount: 8,
         outputCount: 4,
     },
     inputs: {
@@ -13,27 +13,27 @@ const AI_SETTINGS = Object.freeze({
         pathClear: 0,
     },
     geneticAlgorithm: {
-        populationSize: 4,
-        mutationRate: 0.05,
-        mutationStrength: 0.2,
+        populationSize: 50,
+        mutationRate: 0.4,
+        mutationStrength: 0.35,
         crossoverRate: 0.5,
-        parentPoolFraction: 0.5,
-        eliteCount: 1,
-        minimumParentCount: 2,
+        parentPoolFraction: 0.25,
+        eliteCount: 5,
+        minimumParentCount: 1,
     },
     rewards: {
-        dot: 10,
-        powerPellet: 50,
+        dot: 50,
+        powerPellet: 250,
         ghost: 200,
-        collectedPelletBonus: 100,
+        collectedPelletBonus: 550,
         levelCompletedBonus: 10000,
-        survivalPointsPerSecond: 1,
+        survivalPointsPerSecond: -25,
     },
     simulation: {
         framesPerSecond: 60,
         speedDefault: 1,
-        speedMinimum: 1,
-        speedMaximum: 10,
+        speedMinimum: 0,
+        speedMaximum: 500,
         speedStep: 1,
     },
     actors: {
